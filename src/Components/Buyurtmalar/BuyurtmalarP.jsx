@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { IoMdCreate } from 'react-icons/io';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Buyurtmalar = () => {
-  const navigate = useNavigate();
   const [categ, setCateg] = useState([]);
   const [modal, setModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -13,15 +14,11 @@ const Buyurtmalar = () => {
   const [nameRu, setNameRu] = useState("");
   const [img, setImg] = useState(null);
 
-  const logoutFun = () => {
-    localStorage.removeItem("tokenchik");
-    navigate("/");
-  };
-
   const getCategories = () => {
     fetch("https://realauto.limsa.uz/api/categories")
       .then((res) => res.json())
-      .then((elem) => setCateg(elem?.data || []));
+      .then((elem) => setCateg(elem?.data || []))
+      .catch((err) => toast.error("Kategoriyalarni yuklashda xatolik yuz berdi!"));
   };
 
   const createCateg = (e) => {
@@ -42,14 +39,14 @@ const Buyurtmalar = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data?.success) {
-          alert("Kategoriya qo'shildi!");
+          toast.success("Kategoriya qo'shildi!");
           setModal(false);
           getCategories();
         } else {
-          alert("Xatolik yuz berdi. Tekshirib ko'ring!");
+          toast.error("Xatolik yuz berdi. Tekshirib ko'ring!");
         }
       })
-      .catch((err) => console.error("Error:", err));
+      .catch((err) => toast.error("Kategoriyani qo'shishda xatolik yuz berdi!"));
   };
 
   const deleteCategory = (id) => {
@@ -62,13 +59,13 @@ const Buyurtmalar = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data?.success) {
-          alert("Kategoriya o'chirildi!");
+          toast.success("Kategoriya o'chirildi!");
           getCategories();
         } else {
-          alert("O'chirishda xatolik yuz berdi!");
+          toast.error("O'chirishda xatolik yuz berdi!");
         }
       })
-      .catch((err) => console.error("Error:", err));
+      .catch((err) => toast.error("Kategoriyani o'chirishda xatolik yuz berdi!"));
   };
 
   const updateCategory = (e) => {
@@ -89,14 +86,14 @@ const Buyurtmalar = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data?.success) {
-          alert("Kategoriya yangilandi!");
+          toast.success("Kategoriya yangilandi!");
           setEditModal(false);
           getCategories();
         } else {
-          alert("Yangilashda xatolik yuz berdi!");
+          toast.error("Yangilashda xatolik yuz berdi!");
         }
       })
-      .catch((err) => console.error("Error:", err));
+      .catch((err) => toast.error("Kategoriyani yangilashda xatolik yuz berdi!"));
   };
 
   const openEditModal = (category) => {
@@ -117,6 +114,8 @@ const Buyurtmalar = () => {
 
   return (
     <div>
+      <ToastContainer position="top-right" autoClose={3000} />
+      
       {modal && (
         <div className="modal-overlay">
           <form onSubmit={createCateg} className="form2">
@@ -136,6 +135,7 @@ const Buyurtmalar = () => {
               onChange={(e) => setNameRu(e.target.value)}
             />
             <input
+              className='file'
               type="file"
               accept="image/*"
               onChange={(e) => setImg(e?.target?.files[0])}
@@ -144,6 +144,7 @@ const Buyurtmalar = () => {
           </form>
         </div>
       )}
+
       {editModal && (
         <div className="modal-overlay">
           <form onSubmit={updateCategory} className="form2">
@@ -171,11 +172,11 @@ const Buyurtmalar = () => {
           </form>
         </div>
       )}
-        <button  class="button-85" role="button" onClick={logoutFun}>Log Out</button>
-   
-  
-      {!modal && !editModal && <button class="button-85" role="button" onClick={() => setModal(true)}>Kategoriya qo'shish</button>}
-     
+       
+      {!modal && !editModal && (
+        <a onClick={() => setModal(true)} href="#" className="button">Kategoriya qo'shish</a>
+      )}
+      
       <table id="customers">
         <thead className='thead'>
           <tr>
@@ -184,7 +185,6 @@ const Buyurtmalar = () => {
             <th>Name_ru</th>
             <th>Image</th>
             <th>Edit</th>
-            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -201,17 +201,16 @@ const Buyurtmalar = () => {
                   />
                 </div>
               </td>
-              <td>
+              <td className='td_flex'>
                 <button onClick={() => openEditModal(items)}><IoMdCreate /></button>
-              </td>
-              <td>
                 <button onClick={() => deleteCategory(items?.id)}><IoClose /></button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className=''>
+
+      <div>
         <Outlet />
       </div>
     </div>

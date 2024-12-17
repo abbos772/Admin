@@ -1,0 +1,271 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 50%;
+  left: 52%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  height: auto;
+  background-color: #efeeee;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+.modal-overlay .form2 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.modal-overlay .form2 .file {
+  border: 0;
+  background-color: 0;
+}
+.modal-overlay .form2 input {
+  width: 100%;
+  padding: 10px;
+  height: 45px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  outline: 0;
+  opacity: 0px;
+}
+.modal-overlay .form2 button {
+  border: 0;
+  background: 0;
+  cursor: pointer;
+  font-size: 18px;
+}
+.modal-overlay .form2 button:hover {
+  color: rgb(255, 12, 12);
+}
+
+#customers {
+  width: 100%;
+  max-width: 1000px;
+  margin-left: 50px;
+  box-sizing: border-box;
+  height: auto;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+#customers .thead {
+  margin-bottom: -2px;
+  height: 58px;
+  background: rgb(1, 56, 77);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#customers .thead th {
+  font-family: sans-serif;
+  color: rgb(255, 255, 255);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 18.29px;
+  text-align: center;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+.td_flex {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+tr {
+  padding-left: 20px;
+  padding-right: 20px;
+  width: 100%;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgb(0, 0, 0);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0%;
+  border: 1px solid rgb(1, 56, 77);
+}
+
+td {
+  width: 50px;
+}
+td svg {
+  cursor: pointer;
+}
+td button {
+  border: 0;
+  background: 0;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.img_flex {
+  width: 60px;
+  height: 50px;
+}
+.img_flex img {
+  -o-object-fit: cover;
+     object-fit: cover;
+  width: 50px;
+  height: 50px;
+}
+
+.admin_flex {
+  height: 100vh;
+  gap: 10px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  align-items: center;
+}
+.admin_flex .out {
+  display: flex;
+}
+.admin_flex .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: rgb(1, 56, 77);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 0 20px;
+  height: 70px;
+  background: rgb(1, 56, 77);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.admin_flex .navbar .nav {
+  gap: 120px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+}
+.admin_flex .navbar .nav .Logo {
+  height: 69px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin_dashboard {
+  background: rgb(1, 56, 77);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+}
+
+.btns {
+  padding-top: 10px;
+  width: 100%;
+}
+.btns .Link {
+  outline: 0 !important;
+  text-decoration: none !important;
+}
+.btns button {
+  width: 100%;
+  height: 50px;
+  top: 70px;
+  gap: 10px;
+  opacity: 0px;
+  display: flex;
+  align-items: center;
+  padding: 30px;
+  padding-left: 40px;
+  gap: 10px;
+  cursor: pointer;
+  background: 0;
+  border: 0;
+  color: white;
+  font-family: sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 19.5px;
+  text-align: left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+.btns button svg {
+  color: white;
+}
+.btns button h4 {
+  color: white;
+}
+
+.btn1:focus {
+  background: rgb(234, 191, 159);
+}
+
+.button {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10rem;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-left: 50px;
+  letter-spacing: 0.15rem;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+.button:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #01384D;
+  border-radius: 10rem;
+  z-index: -2;
+}
+.button:before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  background-color: #008fb3;
+  transition: all 0.3s;
+  border-radius: 10rem;
+  z-index: -1;
+}
+.button:hover {
+  color: #fff;
+}
+.button:hover:before {
+  width: 100%;
+}
+
+* {
+  font-family: Arial;
+  text-decoration: none;
+  font-size: 20px;
+}
+
+h1 {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  margin-bottom: 2rem;
+  color: #777;
+}/*# sourceMappingURL=Admin.css.map */
