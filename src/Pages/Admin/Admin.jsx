@@ -118,18 +118,18 @@ const HomePage = () => {
       <div className="admin_flex">
         <div className="admin_dashboard">
           <div className="btns">
-            <button className="btn1"><AiFillHome /> Buyurtmalar</button>
+            <button className="btn1"><AiFillHome /> All</button>
             <Link className="Link" to={'Buyurtmalar'}>
-              <button className="btn1"><IoHomeSharp /> Buyurtmalar</button>
+              <button className="btn1"><IoHomeSharp /> All</button>
             </Link>
             <Link className="Link" to={'Сustomers'}>
-              <button className="btn1"><FaUser /> Сustomers</button>
+              <button className="btn1"><FaUser /> Users</button>
             </Link>
             <Link className="Link" to={'Toifalar'}>
-              <button className="btn1"><MdDashboard /> Toifalar</button>
+              <button className="btn1"><MdDashboard /> Categories</button>
             </Link>
             <Link className="Link" to={'Mahsulotlar'}>
-              <button className="btn1"><FaCartShopping /> Mahsulotlar</button>
+              <button className="btn1"><FaCartShopping /> Model</button>
             </Link>
             <Link className="Link" to={'Manzil'}>
               <button className="btn1"><MdLocationOn /> Manzil</button>
