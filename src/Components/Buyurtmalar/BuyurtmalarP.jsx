@@ -4,96 +4,82 @@ import { IoMdCreate } from 'react-icons/io';
 import { Outlet } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Modal from '../Modal/Modal';
 
 const Buyurtmalar = () => {
-  const [categ, setCateg] = useState([]);
-  const [modal, setModal] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
-  const [nameEn, setNameEn] = useState("");
-  const [nameRu, setNameRu] = useState("");
+  const [nameEn, setNameEn] = useState('');
+  const [nameRu, setNameRu] = useState('');
   const [img, setImg] = useState(null);
 
   const getCategories = () => {
-    fetch("https://realauto.limsa.uz/api/categories")
+    fetch('https://realauto.limsa.uz/api/categories')
       .then((res) => res.json())
-      .then((elem) => setCateg(elem?.data || []))
-      .catch((err) => toast.error("Kategoriyalarni yuklashda xatolik yuz berdi!"));
+      .then((data) => setCategories(data?.data || []))
+      .catch(() => toast.error('Kategoriyalarni yuklashda xatolik yuz berdi!'));
   };
 
-  const createCateg = (e) => {
+  const handleCreateOrUpdate = (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("name_en", nameEn);
-    formData.append("name_ru", nameRu);
-    formData.append("images", img);
+    formData.append('name_en', nameEn);
+    formData.append('name_ru', nameRu);
+    if (img) formData.append('images', img);
 
-    fetch("https://realauto.limsa.uz/api/categories", {
-      method: "POST",
+    const url = editModal
+      ? `https://realauto.limsa.uz/api/categories/${selectedId}`
+      : 'https://realauto.limsa.uz/api/categories';
+
+    const method = editModal ? 'PUT' : 'POST';
+
+    fetch(url, {
+      method,
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("tokenchik")}`,
+        Authorization: `Bearer ${localStorage.getItem('tokenchik')}`,
       },
       body: formData,
     })
       .then((res) => res.json())
       .then((data) => {
         if (data?.success) {
-          toast.success("Kategoriya qo'shildi!");
-          setModal(false);
+          toast.success(editModal ? 'Kategoriya yangilandi!' : "Kategoriya qo'shildi!");
+          closeModal();
           getCategories();
         } else {
           toast.error("Xatolik yuz berdi. Tekshirib ko'ring!");
         }
       })
-      .catch((err) => toast.error("Kategoriyani qo'shishda xatolik yuz berdi!"));
+      .catch(() => toast.error('Kategoriyani saqlashda xatolik yuz berdi!'));
   };
 
   const deleteCategory = (id) => {
     fetch(`https://realauto.limsa.uz/api/categories/${id}`, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("tokenchik")}`,
+        Authorization: `Bearer ${localStorage.getItem('tokenchik')}`,
       },
     })
       .then((res) => res.json())
       .then((data) => {
         if (data?.success) {
-          toast.success("Kategoriya o'chirildi!");
+          toast.success('Kategoriya o\'chirildi!');
           getCategories();
         } else {
           toast.error("O'chirishda xatolik yuz berdi!");
         }
       })
-      .catch((err) => toast.error("Kategoriyani o'chirishda xatolik yuz berdi!"));
+      .catch(() => toast.error('Kategoriyani o\'chirishda xatolik yuz berdi!'));
   };
 
-  const updateCategory = (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("name_en", nameEn);
-    formData.append("name_ru", nameRu);
-    if (img) formData.append("images", img);
-
-    fetch(`https://realauto.limsa.uz/api/categories/${selectedId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("tokenchik")}`,
-      },
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data?.success) {
-          toast.success("Kategoriya yangilandi!");
-          setEditModal(false);
-          getCategories();
-        } else {
-          toast.error("Yangilashda xatolik yuz berdi!");
-        }
-      })
-      .catch((err) => toast.error("Kategoriyani yangilashda xatolik yuz berdi!"));
+  const openCreateModal = () => {
+    setNameEn('');
+    setNameRu('');
+    setImg(null);
+    setModalOpen(true);
   };
 
   const openEditModal = (category) => {
@@ -102,6 +88,14 @@ const Buyurtmalar = () => {
     setNameRu(category.name_ru);
     setImg(null);
     setEditModal(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditModal(false);
+    setNameEn('');
+    setNameRu('');
+    setImg(null);
   };
 
   useEffect(() => {
@@ -115,70 +109,24 @@ const Buyurtmalar = () => {
   return (
     <div>
       <ToastContainer position="top-right" autoClose={3000} />
-      
-      {modal && (
-        <div className="modal-overlay">
-          <form onSubmit={createCateg} className="form2">
-            <button className="close-button" onClick={() => setModal(false)}>
-              <IoClose />
-            </button>
-            <input
-              type="text"
-              placeholder="Name EN"
-              value={nameEn}
-              onChange={(e) => setNameEn(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Name RU"
-              value={nameRu}
-              onChange={(e) => setNameRu(e.target.value)}
-            />
-            <input
-              className='file'
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImg(e?.target?.files[0])}
-            />
-            <button type="submit">Qo'shish</button>
-          </form>
-        </div>
-      )}
+      <a  className="button" onClick={() => setModalOpen(true)} href="#">
+      Kategoriya qo'shish
+      </a>
 
-      {editModal && (
-        <div className="modal-overlay">
-          <form onSubmit={updateCategory} className="form2">
-            <button className="close-button" onClick={() => setEditModal(false)}>
-              <IoClose />
-            </button>
-            <input
-              type="text"
-              placeholder="Name EN"
-              value={nameEn}
-              onChange={(e) => setNameEn(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Name RU"
-              value={nameRu}
-              onChange={(e) => setNameRu(e.target.value)}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImg(e?.target?.files[0])}
-            />
-            <button type="submit">Yangilash</button>
-          </form>
-        </div>
-      )}
-       
-      {!modal && !editModal && (
-        <a onClick={() => setModal(true)} href="#" className="button">Kategoriya qo'shish</a>
-      )}
-      
+      <Modal
+        isOpen={modalOpen || editModal}
+        onClose={closeModal}
+        onSubmit={handleCreateOrUpdate}
+        nameEn={nameEn}
+        setNameEn={setNameEn}
+        nameRu={nameRu}
+        setNameRu={setNameRu}
+        setImg={setImg}
+        buttonText={editModal ? 'Yangilash' : "Qo'shish"}
+      />
+
       <table id="customers">
-        <thead className='thead'>
+        <thead className="thead">
           <tr>
             <th>ID</th>
             <th>Name_en</th>
@@ -188,22 +136,26 @@ const Buyurtmalar = () => {
           </tr>
         </thead>
         <tbody>
-          {categ?.map((items, ind) => (
-            <tr key={ind}>
-              <td>{ind + 1}</td>
-              <td>{truncateText(items?.name_en, 8)}</td>
-              <td>{truncateText(items?.name_ru, 8)}</td>
+          {categories?.map((item, index) => (
+            <tr key={item.id}>
+              <td>{index + 1}</td>
+              <td>{truncateText(item.name_en, 8)}</td>
+              <td>{truncateText(item.name_ru, 8)}</td>
               <td>
-                <div className='img_flex'>
+                <div className="img_flex">
                   <img
-                    src={`https://realauto.limsa.uz/api/uploads/images/${items?.image_src}`}
-                    alt={items?.name_en}
+                    src={`https://realauto.limsa.uz/api/uploads/images/${item.image_src}`}
+                    alt={item.name_en}
                   />
                 </div>
               </td>
-              <td className='td_flex'>
-                <button onClick={() => openEditModal(items)}><IoMdCreate /></button>
-                <button onClick={() => deleteCategory(items?.id)}><IoClose /></button>
+              <td className="td_flex">
+                <button onClick={() => openEditModal(item)}>
+                  <IoMdCreate />
+                </button>
+                <button onClick={() => deleteCategory(item.id)}>
+                  <IoClose />
+                </button>
               </td>
             </tr>
           ))}
