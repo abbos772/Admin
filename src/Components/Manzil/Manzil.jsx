@@ -190,9 +190,9 @@ const Manzil = () => {
               <td>{ind + 1}</td>
               <td>{truncateText(items?.name, 8)}</td>
               <td>{truncateText(items?.text, 8)}</td>
-              <td>
-                <img src={`https://realauto.limsa.uz/api/uploads/images/${items?.image_src}`} alt={items?.name} />
-              </td>
+              <div className='img_flex'>
+                <img  src={`https://realauto.limsa.uz/api/uploads/images/${items?.image_src}`}  alt={items?.name}   />
+                </div>
               <td className="td_flex">
                 <button
                   onClick={() => {
