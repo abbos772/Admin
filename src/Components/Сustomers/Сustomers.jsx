@@ -105,8 +105,8 @@ const Customers = () => {
 	// Open edit modal with pre-filled category data
 	const openEditModal = category => {
 		setSelectedId(category.id)
-		setNameEn(category.name_en)
-		setNameRu(category.name_ru)
+		setNameEn(category.name)
+		setNameRu(category.text)
 		setImg(null) // Ensure that image is not retained during editing
 		setEditModal(true)
 	}
@@ -167,8 +167,8 @@ const Customers = () => {
 					{categ?.map((items, ind) => (
 						<tr key={ind}>
 							<td>{ind + 1}</td>
-							<td>{truncateText(items?.name_en, 8)}</td>
-							<td>{truncateText(items?.name_ru, 8)}</td>
+							<td>{truncateText(items?.name, 8)}</td>
+							<td>{truncateText(items?.text, 8)}</td>
 							<td>
 								<div className='img_flex'>
 									<img
