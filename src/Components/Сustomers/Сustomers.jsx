@@ -32,7 +32,7 @@ const Customers = () => {
 		formData.append('text', nameRu)
 		formData.append('images', img)
 
-		fetch('https://realauto.limsa.uz/api/categories', {
+		fetch('https://realauto.limsa.uz/api/cities', {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${localStorage.getItem('tokenchik')}`,
