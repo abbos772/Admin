@@ -8,6 +8,7 @@ import Сustomers from './Components/Сustomers/Сustomers'
 import Toifalar from './Components/Toifalar/Toifalar'
 import Mahsulotlar from './Components/Mahsulotlar/Mahsulotlar'
 import Manzil from './Components/Manzil/Manzil'
+import Cars from './Components/Cars/Cars'
 function App() {
   const tokenxon = localStorage.getItem("tokenchik")
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ function App() {
         <Route path='Toifalar' element={<Toifalar/>}/>
         <Route path='Mahsulotlar' element={<Mahsulotlar/>}/>
         <Route path='Manzil' element={<Manzil/>}/>
+        <Route path='Cars' element={<Cars/>}/>
         </Route>  
         <Route/>
       </Routes>

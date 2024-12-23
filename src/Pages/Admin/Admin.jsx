@@ -144,11 +144,17 @@ const HomePage = () => {
 								<FaCartShopping /> Model
 							</button>
 						</Link>
-						<Link className='Link' to={'Manzil'}>
+						<Link className='Link' to={'Cars'}>
 							<button className='btn1'>
-								<MdLocationOn /> Manzil
+								<MdLocationOn /> Cars
 							</button>
 						</Link>
+						<Link className='Link' to={'Manzil'}>
+							<button className='btn1'>
+								<MdLocationOn /> Location
+							</button>
+						</Link>
+						
 					</div>
 				</div>
 
