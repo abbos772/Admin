@@ -6,9 +6,9 @@ import { IoClose } from "react-icons/io5";
 
 const style = {
   position: "absolute",
-  top: "50%",
+  top: "10%",
   left: "50%",
-  transform: "translate(-50%, -50%)",
+  transform: "translate(-50%, -10%)",
   height: "90%",
   bgcolor: "background.paper",
   border: "2px solid #000",
@@ -27,18 +27,47 @@ const Cars = () => {
   const [locations, setLocations] = useState([]);
   const [categories, setCategories] = useState([]);
   const [element, setElement] = useState(null);
+
   const [formData, setFormData] = useState({
-    brand: "",
-    model: "",
-    city: "",
-    category: "",
-    location: "",
+    brand_id: "",
+    model_id: "",
+    city_id: "",
+    category_id: "",
+    location_id: "",
     transmission: "",
-    image: null,  // Added for image
+    num_seats: "",
+    fuel_type: "",
+    engine_capacity: "",
+    mileage: "",
+    year: "",
+    image1: null,
+    image2: null,
+    image3: null,
+    max_speed: 120,
+    max_people: 4,
+    price_in_aed: "",
+    price_in_usd: "",
+    color: "",
   });
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+
   const token = localStorage.getItem("tokenchik");
+
+  const fields = [
+    { name: "brand_id", label: "Brand", options: brands },
+    { name: "model_id", label: "Model", options: models },
+    { name: "city_id", label: "City", options: cities },
+    { name: "category_id", label: "Category", options: categories },
+    { name: "location_id", label: "Location", options: locations },
+    { name: "transmission", label: "Transmission" },
+    { name: "num_seats", label: "Number of Seats" }, 
+    { name: "fuel_type", label: "Fuel Type" },
+    { name: "engine_capacity", label: "Engine Capacity" },
+    { name: "mileage", label: "Mileage" },
+    { name: "year", label: "Year" },
+    { name: "price_in_aed", label: "Price in AED" },
+    { name: "price_in_usd", label: "Price in USD" },
+    { name: "color", label: "Color" },
+  ];
 
   const fetchData = async (url, setter) => {
     try {
@@ -65,13 +94,23 @@ const Cars = () => {
     const selectedCar = cars.find((car) => car.id === id);
     setElement(selectedCar || null);
     setFormData({
-      brand: selectedCar?.brand || "",
-      model: selectedCar?.model || "",
-      city: selectedCar?.city || "",
-      category: selectedCar?.category || "",
-      location: selectedCar?.location || "",
+      brand_id: selectedCar?.brand_id || "",
+      model_id: selectedCar?.model_id || "",
+      city_id: selectedCar?.city_id || "",
+      category_id: selectedCar?.category_id || "",
+      location_id: selectedCar?.location_id || "",
       transmission: selectedCar?.transmission || "",
-      image: selectedCar?.image || null,
+      num_seats: selectedCar?.num_seats || "",
+      fuel_type: selectedCar?.fuel_type || "",
+      engine_capacity: selectedCar?.engine_capacity || "",
+      mileage: selectedCar?.mileage || "",
+      year: selectedCar?.year || "",
+      price_in_aed: selectedCar?.price_in_aed || "",
+      price_in_usd: selectedCar?.price_in_usd || "",
+      color: selectedCar?.color || "",
+      image1: null,
+      image2: null,
+      image3: null,
     });
     setModal(true);
   };
@@ -84,44 +123,24 @@ const Cars = () => {
     }));
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e, index) => {
     const file = e.target.files[0];
-    setFormData((prevState) => ({
-      ...prevState,
-      image: file,
-    }));
-  };
-
-  const deleteCars = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this item?")) return;
-    try {
-      const response = await fetch(`https://realauto.limsa.uz/api/cars/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (response.status === 200) getCars();
-      else throw new Error("Failed to delete");
-    } catch (err) {
-      console.error(err);
+    if (file) {
+      setFormData((prevState) => ({
+        ...prevState,
+        [`image${index}`]: file,
+      }));
     }
-  };
-
-  const totalPages = Math.ceil(cars.length / itemsPerPage);
-  const paginatedCars = cars.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  const changePage = (newPage) => {
-    if (newPage > 0 && newPage <= totalPages) setCurrentPage(newPage);
   };
 
   const handleSubmit = async (carId) => {
     const formDataToSubmit = new FormData();
-    formDataToSubmit.append("brand", formData.brand);
-    formDataToSubmit.append("model", formData.model);
-    formDataToSubmit.append("city", formData.city);
-    formDataToSubmit.append("category", formData.category);
-    formDataToSubmit.append("location", formData.location);
-    formDataToSubmit.append("transmission", formData.transmission);
-    if (formData.image) formDataToSubmit.append("image", formData.image);
+
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] !== null && formData[key] !== undefined) {
+        formDataToSubmit.append(key, formData[key]);
+      }
+    });
 
     try {
       const url = carId
@@ -132,26 +151,19 @@ const Cars = () => {
       const response = await fetch(url, {
         method,
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("tokenchik")}`,
+          Authorization: `Bearer ${token}`,
         },
         body: formDataToSubmit,
       });
 
       if (response.ok) {
         alert(carId ? "Car updated successfully!" : "Car added successfully!");
-        getCars(); // Reload cars after submitting
-        setFormData({
-          brand: "",
-          model: "",
-          city: "",
-          category: "",
-          location: "",
-          transmission: "",
-          image: null,
-        }); // Reset form data
+        getCars();
         setModal(false);
       } else {
-        throw new Error("Failed to save car data.");
+        const errorData = await response.json();
+        console.error(errorData);
+        alert(`Error: ${errorData.message || "Failed to save car data."}`);
       }
     } catch (err) {
       console.error(err);
@@ -174,7 +186,6 @@ const Cars = () => {
       <button className="button" onClick={() => setModal(true)}>
         Add New Car
       </button>
-
       <table id="customers">
         <thead>
           <tr>
@@ -185,9 +196,9 @@ const Cars = () => {
           </tr>
         </thead>
         <tbody>
-          {paginatedCars.map((item, index) => (
+          {cars.map((item, index) => (
             <tr key={item.id}>
-              <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
+              <td>{index + 1}</td>
               <td>{item.transmission}</td>
               <td>
                 <img
@@ -208,146 +219,50 @@ const Cars = () => {
           ))}
         </tbody>
       </table>
-
       {modal && (
-        <Modal open={modal} onClose={() => setModal(false)} aria-labelledby="modal-title" aria-describedby="modal-description">
+        <Modal open={modal} onClose={() => setModal(false)}>
           <Box sx={style}>
-            <h2 id="modal-title">{element ? "Edit Car" : "Add New Car"}</h2>
-            <form>
-              <TextField
-                fullWidth
-                label="Brand"
-                name="brand"
-                value={formData.brand}
-                onChange={handleInputChange}
-                margin="normal"
-                select
-                SelectProps={{ native: true }}
-              >
-                <option value="">Select Brand</option>
-                {brands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.title}
-                  </option>
-                ))}
-              </TextField>
-
-              <TextField
-                fullWidth
-                label="Model"
-                name="model"
-                value={formData.model}
-                onChange={handleInputChange}
-                margin="normal"
-                select
-                SelectProps={{ native: true }}
-              >
-                <option value="">Select Model</option>
-                {models.map((model) => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))}
-              </TextField>
-
-              <TextField
-                fullWidth
-                label="City"
-                name="city"
-                value={formData.city}
-                onChange={handleInputChange}
-                margin="normal"
-                select
-                SelectProps={{ native: true }}
-              >
-                <option value="">Select City</option>
-                {cities.map((city) => (
-                  <option key={city.id} value={city.id}>
-                    {city.name}
-                  </option>
-                ))}
-              </TextField>
-
-              <TextField
-                fullWidth
-                label="Category"
-                name="category"
-                value={formData.category}
-                onChange={handleInputChange}
-                margin="normal"
-                select
-                SelectProps={{ native: true }}
-              >
-                <option value="">Select Category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name_en}
-                  </option>
-                ))}
-              </TextField>
-
-              <TextField
-                fullWidth
-                label="Location"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                margin="normal"
-                select
-                SelectProps={{ native: true }}
-              >
-                <option value="">Select Location</option>
-                {locations.map((location) => (
-                  <option key={location.id} value={location.id}>
-                    {location.name}
-                  </option>
-                ))}
-              </TextField>
-
-              <TextField
-                fullWidth
-                label="Transmission"
-                name="transmission"
-                value={formData.transmission}
-                onChange={handleInputChange}
-                margin="normal"
-              />
-
-              <div>
-                <label htmlFor="image">Car Image</label>
-                <input
-                  type="file"
-                  id="image"
-                  name="image"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-              </div>
-
-              <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-                <Button variant="outlined" onClick={() => setModal(false)}>
-                  Cancel
-                </Button>
-                <Button variant="contained" color="primary" onClick={() => handleSubmit(element?.id)}>
-                  {element ? "Save Changes" : "Add Car"}
-                </Button>
-              </Box>
+            <h2>{element ? "Edit Car" : "Add New Car"}</h2>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit(element?.id);
+              }}
+            >
+              {fields.map((field) => (
+                <TextField
+                  key={field.name}
+                  fullWidth
+                  margin="normal"
+                  label={field.label}
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={handleInputChange}
+                  select={!!field.options}
+                  SelectProps={{ native: true }}
+                >
+                  {field.options && (
+                    <>
+                      <option value="">Select {field.label}</option>
+                      {field.options.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name || option.title || option.text || option.name_en || option.name_ru}
+                        </option>
+                      ))}
+                    </>
+                  )}
+                </TextField>
+              ))}
+              <input type="file" onChange={(e) => handleImageChange(e, 1)} accept="image/*" />
+              <input type="file" onChange={(e) => handleImageChange(e, 2)} accept="image/*" />
+              <input type="file" onChange={(e) => handleImageChange(e, 3)} accept="image/*" />
+              <Button type="submit" variant="contained" sx={{ mt: 2 }}>
+                {element ? "Update Car" : "Add Car"}
+              </Button>
             </form>
           </Box>
         </Modal>
       )}
-
-      <div className="pagination">
-        <button onClick={() => changePage(currentPage - 1)} disabled={currentPage === 1}>
-          Prev
-        </button>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
-        <button onClick={() => changePage(currentPage + 1)} disabled={currentPage === totalPages}>
-          Next
-        </button>
-      </div>
     </div>
   );
 };
