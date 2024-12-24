@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Box, TextField, Button } from "@mui/material";
+import { Modal, Box, TextField, Button, FormControlLabel, Checkbox } from "@mui/material";
 import { ToastContainer } from "react-toast";
 import { IoMdCreate } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
@@ -48,6 +48,7 @@ const Cars = () => {
     price_in_aed: "",
     price_in_usd: "",
     color: "",
+    available: false,
   });
 
   const token = localStorage.getItem("tokenchik");
@@ -59,7 +60,7 @@ const Cars = () => {
     { name: "category_id", label: "Category", options: categories },
     { name: "location_id", label: "Location", options: locations },
     { name: "transmission", label: "Transmission" },
-    { name: "num_seats", label: "Number of Seats" }, 
+    { name: "num_seats", label: "Number of Seats" },
     { name: "fuel_type", label: "Fuel Type" },
     { name: "engine_capacity", label: "Engine Capacity" },
     { name: "mileage", label: "Mileage" },
@@ -108,6 +109,7 @@ const Cars = () => {
       price_in_aed: selectedCar?.price_in_aed || "",
       price_in_usd: selectedCar?.price_in_usd || "",
       color: selectedCar?.color || "",
+      available: selectedCar?.available || false,
       image1: null,
       image2: null,
       image3: null,
@@ -116,10 +118,10 @@ const Cars = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -133,23 +135,22 @@ const Cars = () => {
     }
   };
 
-  const handleSubmit = async (carId) => {
+  const handleAddCar = async () => {
     const formDataToSubmit = new FormData();
 
     Object.keys(formData).forEach((key) => {
-      if (formData[key] !== null && formData[key] !== undefined) {
+      if (formData[key] !== null && formData[key] !== undefined && key !== 'image1' && key !== 'image2' && key !== 'image3') {
         formDataToSubmit.append(key, formData[key]);
       }
     });
 
-    try {
-      const url = carId
-        ? `https://realauto.limsa.uz/api/cars/${carId}`
-        : "https://realauto.limsa.uz/api/cars";
-      const method = carId ? "PUT" : "POST";
+    if (formData.image1) formDataToSubmit.append("image1", formData.image1);
+    if (formData.image2) formDataToSubmit.append("image2", formData.image2);
+    if (formData.image3) formDataToSubmit.append("image3", formData.image3);
 
-      const response = await fetch(url, {
-        method,
+    try {
+      const response = await fetch("https://realauto.limsa.uz/api/cars", {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -157,17 +158,60 @@ const Cars = () => {
       });
 
       if (response.ok) {
-        alert(carId ? "Car updated successfully!" : "Car added successfully!");
+        alert("Car added successfully!");
         getCars();
         setModal(false);
       } else {
         const errorData = await response.json();
-        console.error(errorData);
-        alert(`Error: ${errorData.message || "Failed to save car data."}`);
+        alert(`Error: ${errorData.message || "Failed to add car."}`);
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred while saving the data.");
+      alert("An error occurred while adding the car.");
+    }
+  };
+
+  const handleUpdateCar = async (carId) => {
+    const formDataToSubmit = new FormData();
+
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] !== null && formData[key] !== undefined && key !== 'image1' && key !== 'image2' && key !== 'image3') {
+        formDataToSubmit.append(key, formData[key]);
+      }
+    });
+
+    if (formData.image1) formDataToSubmit.append("image1", formData.image1);
+    if (formData.image2) formDataToSubmit.append("image2", formData.image2);
+    if (formData.image3) formDataToSubmit.append("image3", formData.image3);
+
+    try {
+      const response = await fetch(`https://realauto.limsa.uz/api/cars/${carId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataToSubmit,
+      });
+
+      if (response.ok) {
+        alert("Car updated successfully!");
+        getCars();
+        setModal(false);
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message || "Failed to update car."}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while updating the car.");
+    }
+  };
+
+  const handleSubmit = async (carId) => {
+    if (carId) {
+      handleUpdateCar(carId);
+    } else {
+      handleAddCar();
     }
   };
 
@@ -256,6 +300,16 @@ const Cars = () => {
               <input type="file" onChange={(e) => handleImageChange(e, 1)} accept="image/*" />
               <input type="file" onChange={(e) => handleImageChange(e, 2)} accept="image/*" />
               <input type="file" onChange={(e) => handleImageChange(e, 3)} accept="image/*" />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.available}
+                    onChange={handleInputChange}
+                    name="available"
+                  />
+                }
+                label="Available"
+              />
               <Button type="submit" variant="contained" sx={{ mt: 2 }}>
                 {element ? "Update Car" : "Add Car"}
               </Button>
