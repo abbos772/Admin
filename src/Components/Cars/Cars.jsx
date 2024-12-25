@@ -74,8 +74,6 @@ const Cars = () => {
 		{ name: 'year', label: 'Year' },
 		{ name: 'seconds', label: 'Seconds' },
 		{ name: 'category_id', label: 'Category', options: categories },
-		// { name: 'images', label: 'Images' },
-		// { name: 'images', label: 'Images' },
 		{ name: 'max_speed', label: 'Maximum speed' },
 		{ name: 'max_people', label: 'Number of Seats' },
 		{ name: 'transmission', label: 'Transmission' },
@@ -84,20 +82,15 @@ const Cars = () => {
 		{ name: 'petrol', label: 'Fuel Type' },
 		{ name: 'limitperday', label: 'Mileage' },
 		{ name: 'deposit', label: 'Deposit' },
-		{
-			name: 'premium_protection',
-			label: 'Premium Protection',
-			type: 'checkbox',
-		},
-		{ name: 'price_in_aed', label: 'Price in AED' },
-		{ name: 'price_in_usd', label: 'Price in USD' },
-		{ name: 'price_in_aed_sale', label: 'Price in SALE in AED' },
-		{ name: 'price_in_usd_sale', label: 'Price in SALE in USD' },
+		{ name: 'premium_protection', label: 'Premium Protection', type: 'checkbox' },
+		{ name: 'price_in_aed', label: 'Price in AED', type: 'number' }, // Updated
+		{ name: 'price_in_usd', label: 'Price in USD', type: 'number' }, // Updated
+		{ name: 'price_in_aed_sale', label: 'Price in SALE in AED', type: 'number' }, // Updated
+		{ name: 'price_in_usd_sale', label: 'Price in SALE in USD', type: 'number' }, // Updated
 		{ name: 'location_id', label: 'Location', options: locations },
 		{ name: 'inclusive', label: 'Inclusive', type: 'checkbox' },
-		// { name: 'cover', label: 'Cover' },
-	]
-
+	  ]
+	  
 	const fetchData = async (url, setter) => {
 		try {
 			const response = await fetch(url, {
@@ -111,7 +104,28 @@ const Cars = () => {
 			console.error(err)
 		}
 	}
-
+	const deleteCars = async id => {
+		try {
+			const response = await fetch(`https://realauto.limsa.uz/api/cars/${id}`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${token}`,
+					'Content-Type': 'application/json',
+				},
+			});
+			if (response.ok) {
+				alert('Car deleted successfully!');
+				getCars(); // Avtomobillar ro'yxatini yangilash
+			} else {
+				const errorData = await response.json();
+				alert(`Error: ${errorData.message || 'Failed to delete car.'}`);
+			}
+		} catch (err) {
+			console.error(err);
+			alert('An error occurred while deleting the car.');
+		}
+	};
+	
 	const getCars = () => fetchData('https://realauto.limsa.uz/api/cars', setCars)
 	const getBrands = () =>
 		fetchData('https://realauto.limsa.uz/api/brands', setBrands)
@@ -158,13 +172,26 @@ const Cars = () => {
 	}
 
 	const handleInputChange = e => {
-		const { name, value, type, checked } = e.target
-		setFormData(prevState => ({
+		const { name, value, type, checked } = e.target;
+	  
+		// Ensure numeric values are numbers
+		if (['price_in_aed', 'price_in_usd', 'price_in_aed_sale', 'price_in_usd_sale', 'deposit'].includes(name) && value !== '') {
+		  const numericValue = parseFloat(value);
+		  if (isNaN(numericValue)) {
+			return; // Ignore non-numeric input
+		  }
+		  setFormData(prevState => ({
+			...prevState,
+			[name]: numericValue,
+		  }));
+		} else {
+		  setFormData(prevState => ({
 			...prevState,
 			[name]: type === 'checkbox' ? checked : value,
-		}))
-	}
-
+		  }));
+		}
+	  };
+	  
 	const handleImageChange = (e, index) => {
 		const file = e.target.files[0]
 		if (file) {
@@ -206,7 +233,7 @@ const Cars = () => {
 				method: 'POST',
 				headers: {
 					Authorization: `Bearer ${token}`,
-				},
+				  },
 				body: formDataToSubmit,
 			})
 
@@ -399,4 +426,4 @@ const Cars = () => {
 	)
 }
 
-export default Cars
+export default Cars  
